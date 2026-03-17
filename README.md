@@ -1,5 +1,7 @@
 # Geometry Drawing Tool
 
+[Try it now](Live: https://guy4261.github.io/hebweek/). Built solely by [`continue.dev`](https://continue.dev).
+
 A browser-based geometry drawing tool with ruler and compass functionality, built with vanilla JavaScript, HTML5 Canvas, and CSS.
 
 ## Features
