@@ -376,3 +376,145 @@ body {
 .modal-content::-webkit-scrollbar-thumb:hover {
     background: #5568d3;
 }
+
+/* Load JSON Modal Styles */
+.load-json-modal {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 500px;
+    max-width: 600px;
+}
+
+.load-json-modal.hidden {
+    display: none;
+}
+
+.load-json-modal .modal-header {
+    cursor: default;
+}
+
+.load-json-description {
+    margin-bottom: 16px;
+    color: #666;
+    font-size: 14px;
+}
+
+.json-drop-zone {
+    border: 2px dashed #667eea;
+    border-radius: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    background: rgba(102, 126, 234, 0.05);
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.json-drop-zone:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: #764ba2;
+}
+
+.json-drop-zone.drag-over {
+    background: rgba(102, 126, 234, 0.15);
+    border-color: #764ba2;
+    border-style: solid;
+}
+
+.json-drop-zone svg {
+    color: #667eea;
+    margin-bottom: 12px;
+}
+
+.drop-zone-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.drop-zone-subtext {
+    font-size: 13px;
+    color: #999;
+}
+
+.json-input {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    resize: vertical;
+    margin-bottom: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.json-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.load-json-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.action-btn.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.action-btn.primary:active {
+    transform: translateY(0);
+}
+
+.action-btn.secondary {
+    background: #f8f9fa;
+    color: #333;
+    border: 2px solid #e0e0e0;
+}
+
+.action-btn.secondary:hover {
+    background: #e9ecef;
+}
+
+.json-error {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255, 107, 107, 0.1);
+    border-left: 3px solid #ff6b6b;
+    border-radius: 4px;
+    color: #d63031;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.json-error.hidden {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .load-json-modal {
+        min-width: 90vw;
+        max-width: 90vw;
+    }
+}

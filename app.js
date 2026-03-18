@@ -56,6 +56,7 @@ class GeometryApp {
         document.getElementById('tool-select').addEventListener('click', () => this.setTool('select'));
         document.getElementById('clear-all').addEventListener('click', () => this.clearAll());
         document.getElementById('copy-json').addEventListener('click', () => this.copyToClipboard());
+        document.getElementById('load-json').addEventListener('click', () => this.showLoadJsonModal());
         
         // Zoom buttons
         document.getElementById('zoom-in').addEventListener('click', () => this.zoomIn());
@@ -92,9 +93,219 @@ class GeometryApp {
             this.setupCanvas();
             this.render();
         });
+
+        // Load JSON modal
+        this.setupLoadJsonModal();
+    }
+
+    setupLoadJsonModal() {
+        const modal = document.getElementById('load-json-modal');
+        const closeBtn = modal.querySelector('[data-action="close"]');
+        const cancelBtn = document.getElementById('cancel-json-btn');
+        const loadBtn = document.getElementById('load-json-btn');
+        const jsonInput = document.getElementById('json-input');
+        const dropZone = document.getElementById('json-drop-zone');
+        const errorDiv = document.getElementById('json-error');
+
+        // Close modal
+        const closeModal = () => {
+            modal.classList.add('hidden');
+            jsonInput.value = '';
+            errorDiv.classList.add('hidden');
+        };
+
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Load JSON button
+        loadBtn.addEventListener('click', () => {
+            const jsonText = jsonInput.value.trim();
+            if (jsonText) {
+                this.loadJsonData(jsonText);
+            } else {
+                this.showJsonError('Please enter or drop a JSON file.');
+            }
+        });
+
+        // Drag and drop functionality
+        dropZone.addEventListener('click', () => {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.json,application/json';
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    this.readJsonFile(file);
+                }
+            };
+            fileInput.click();
+        });
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Highlight drop zone when dragging over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('drag-over');
+            });
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                this.readJsonFile(files[0]);
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    }
+
+    showLoadJsonModal() {
+        const modal = document.getElementById('load-json-modal');
+        const errorDiv = document.getElementById('json-error');
+        errorDiv.classList.add('hidden');
+        modal.classList.remove('hidden');
+    }
+
+    readJsonFile(file) {
+        if (!file.name.endsWith('.json') && file.type !== 'application/json') {
+            this.showJsonError('Please select a valid JSON file.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const jsonText = e.target.result;
+            document.getElementById('json-input').value = jsonText;
+            this.loadJsonData(jsonText);
+        };
+        reader.onerror = () => {
+            this.showJsonError('Failed to read file. Please try again.');
+        };
+        reader.readAsText(file);
+    }
+
+    loadJsonData(jsonText) {
+        try {
+            // Safe JSON parsing with validation
+            const data = JSON.parse(jsonText);
+            
+            // Validate structure
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid JSON structure: expected an object');
+            }
+
+            if (!Array.isArray(data.points)) {
+                throw new Error('Invalid JSON structure: "points" must be an array');
+            }
+
+            if (!Array.isArray(data.lines)) {
+                throw new Error('Invalid JSON structure: "lines" must be an array');
+            }
+
+            if (!Array.isArray(data.circles)) {
+                throw new Error('Invalid JSON structure: "circles" must be an array');
+            }
+
+            // Clear current state
+            this.points = [];
+            this.lines = [];
+            this.circles = [];
+            this.selectedPoint = null;
+            this.tempSelection = null;
+
+            // Create a map to store points by their ID
+            const pointMap = new Map();
+
+            // Load points
+            for (const pointData of data.points) {
+                if (!pointData.id || typeof pointData.x !== 'number' || typeof pointData.y !== 'number') {
+                    throw new Error('Invalid point data: must have id, x, and y');
+                }
+
+                const point = new Point(pointData.x, pointData.y, false);
+                this.points.push(point);
+                pointMap.set(pointData.id, point);
+            }
+
+            // Load lines
+            for (const lineData of data.lines) {
+                if (!Array.isArray(lineData.points) || lineData.points.length !== 2) {
+                    throw new Error('Invalid line data: must have an array of 2 point IDs');
+                }
+
+                const point1 = pointMap.get(lineData.points[0]);
+                const point2 = pointMap.get(lineData.points[1]);
+
+                if (!point1 || !point2) {
+                    throw new Error(`Invalid line data: point IDs not found`);
+                }
+
+                this.lines.push(new Line(point1, point2));
+            }
+
+            // Load circles
+            for (const circleData of data.circles) {
+                if (!circleData.center || typeof circleData.radius !== 'number') {
+                    throw new Error('Invalid circle data: must have center and radius');
+                }
+
+                const center = pointMap.get(circleData.center);
+
+                if (!center) {
+                    throw new Error(`Invalid circle data: center point ID not found`);
+                }
+
+                this.circles.push(new Circle(center, circleData.radius));
+            }
+
+            // Update intersections
+            this.updateIntersections();
+
+            // Render
+            this.render();
+
+            // Close modal
+            document.getElementById('load-json-modal').classList.add('hidden');
+            document.getElementById('json-input').value = '';
+            document.getElementById('json-error').classList.add('hidden');
+
+        } catch (error) {
+            this.showJsonError(`Failed to load JSON: ${error.message}`);
+        }
+    }
+
+    showJsonError(message) {
+        const errorDiv = document.getElementById('json-error');
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
     }
 
     setupModals() {
+        // Don't make load-json-modal draggable
+        const loadJsonModal = document.getElementById('load-json-modal');
+        const loadJsonHeader = loadJsonModal.querySelector('.modal-header');
+        if (loadJsonHeader) {
+            loadJsonHeader.style.cursor = 'default';
+        }
         const modals = document.querySelectorAll('.modal');
         
         modals.forEach(modal => {

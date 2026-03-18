@@ -71,6 +71,12 @@
                     </svg>
                     <span>Copy JSON</span>
                 </button>
+                <button id="load-json" class="tool-btn" title="Load JSON">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor"/>
+                    </svg>
+                    <span>Load JSON</span>
+                </button>
             </div>
             <div class="zoom-controls">
                 <button id="zoom-out" class="zoom-btn" title="Zoom out (-)">
@@ -141,6 +147,40 @@
     <!-- Context Menu -->
     <div id="context-menu" class="context-menu hidden">
         <div class="context-menu-item" data-action="delete">Delete</div>
+    </div>
+
+    <!-- Load JSON Modal -->
+    <div id="load-json-modal" class="modal load-json-modal hidden">
+        <div class="modal-header">
+            <h3 class="modal-title">Load JSON</h3>
+            <div class="modal-controls">
+                <button class="modal-control-btn" data-action="close" title="Close">
+                    <svg width="16" height="16" viewBox="0 0 16 16">
+                        <path d="M12.5 3.5l-9 9m0-9l9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="modal-content">
+            <div class="load-json-description">
+                <p>Paste JSON data or drag and drop a JSON file below:</p>
+            </div>
+            <div id="json-drop-zone" class="json-drop-zone">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <p class="drop-zone-text">Drag & drop a JSON file here</p>
+                <p class="drop-zone-subtext">or paste JSON below</p>
+            </div>
+            <textarea id="json-input" class="json-input" placeholder="Paste JSON here..."></textarea>
+            <div class="load-json-actions">
+                <button id="load-json-btn" class="action-btn primary">Load</button>
+                <button id="cancel-json-btn" class="action-btn secondary">Cancel</button>
+            </div>
+            <div id="json-error" class="json-error hidden"></div>
+        </div>
     </div>
 
     <script src="geometry.js"></script>
