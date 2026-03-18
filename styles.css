@@ -31,6 +31,14 @@ body {
     cursor: grabbing;
 }
 
+#canvas.panning {
+    cursor: grab;
+}
+
+#canvas.panning:active {
+    cursor: grabbing;
+}
+
 .toolbar {
     display: flex;
     gap: 8px;
@@ -76,6 +84,48 @@ body {
     height: 30px;
     background: #e0e0e0;
     margin: 0 3px;
+}
+
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 8px;
+}
+
+.zoom-btn {
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    color: #333;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+}
+
+.zoom-btn:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+    transform: translateY(-1px);
+}
+
+.zoom-btn:active {
+    transform: translateY(0);
+}
+
+.zoom-level {
+    font-size: 13px;
+    font-weight: 600;
+    color: #667eea;
+    min-width: 50px;
+    text-align: center;
 }
 
 /* Modal Styles */

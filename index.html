@@ -58,6 +58,26 @@
                     <span>Clear</span>
                 </button>
             </div>
+            <div class="zoom-controls">
+                <button id="zoom-out" class="zoom-btn" title="Zoom out (-)">
+                    <svg width="20" height="20" viewBox="0 0 20 20">
+                        <line x1="4" y1="10" x2="16" y2="10" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+                <span id="zoom-level" class="zoom-level">100%</span>
+                <button id="zoom-in" class="zoom-btn" title="Zoom in (+)">
+                    <svg width="20" height="20" viewBox="0 0 20 20">
+                        <line x1="10" y1="4" x2="10" y2="16" stroke="currentColor" stroke-width="2"/>
+                        <line x1="4" y1="10" x2="16" y2="10" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+                <button id="zoom-reset" class="zoom-btn" title="Reset zoom (0)">
+                    <svg width="20" height="20" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <text x="10" y="13" text-anchor="middle" font-size="10" fill="currentColor">1:1</text>
+                    </svg>
+                </button>
+            </div>
             <div id="instructions" class="instructions">
                 <div class="instruction-text">Click to place a point</div>
             </div>
@@ -96,6 +116,10 @@
             <div class="info-section">
                 <h4>✨ Auto-Intersections</h4>
                 <p>Intersection points are automatically created when circles intersect</p>
+            </div>
+            <div class="info-section">
+                <h4>🔍 Zoom & Pan</h4>
+                <p>• Mouse wheel to zoom<br>• Shift+drag or middle-click to pan<br>• +/- keys to zoom in/out<br>• 0 key to reset view</p>
             </div>
         </div>
     </div>

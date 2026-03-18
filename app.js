@@ -20,9 +20,16 @@ class GeometryApp {
         // Interaction state
         this.isDragging = false;
         this.isDraggingModal = false;
+        this.isPanning = false;
         this.hoveredPoint = null;
         this.draggedModal = null;
         this.modalDragOffset = { x: 0, y: 0 };
+        this.lastPanPoint = { x: 0, y: 0 };
+        
+        // Zoom and pan state
+        this.zoom = 1.0;
+        this.panX = 0;
+        this.panY = 0;
         
         // UI elements
         this.contextMenu = document.getElementById('context-menu');
@@ -48,6 +55,11 @@ class GeometryApp {
         document.getElementById('tool-compass').addEventListener('click', () => this.setTool('compass'));
         document.getElementById('tool-select').addEventListener('click', () => this.setTool('select'));
         document.getElementById('clear-all').addEventListener('click', () => this.clearAll());
+        
+        // Zoom buttons
+        document.getElementById('zoom-in').addEventListener('click', () => this.zoomIn());
+        document.getElementById('zoom-out').addEventListener('click', () => this.zoomOut());
+        document.getElementById('zoom-reset').addEventListener('click', () => this.resetZoom());
 
         // Canvas events
         this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
@@ -55,6 +67,7 @@ class GeometryApp {
         this.canvas.addEventListener('mouseup', (e) => this.handleMouseUp(e));
         this.canvas.addEventListener('mouseleave', (e) => this.handleMouseLeave(e));
         this.canvas.addEventListener('contextmenu', (e) => this.handleContextMenu(e));
+        this.canvas.addEventListener('wheel', (e) => this.handleWheel(e));
 
         // Keyboard events
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
@@ -147,15 +160,22 @@ class GeometryApp {
         });
         document.getElementById(`tool-${tool}`).classList.add('active');
 
-        // Update cursor
-        if (tool === 'select') {
-            this.canvas.classList.add('select-mode');
-        } else {
-            this.canvas.classList.remove('select-mode');
-        }
-
+        this.updateCanvasCursor();
         this.updateInstructions();
         this.render();
+    }
+
+    updateCanvasCursor() {
+        this.canvas.classList.remove('select-mode', 'dragging');
+        
+        if (this.isPanning) {
+            this.canvas.style.cursor = 'grabbing';
+        } else if (this.currentTool === 'select') {
+            this.canvas.classList.add('select-mode');
+            this.canvas.style.cursor = 'default';
+        } else {
+            this.canvas.style.cursor = 'crosshair';
+        }
     }
 
     updateInstructions() {
@@ -171,15 +191,47 @@ class GeometryApp {
 
     getMousePos(e) {
         const rect = this.canvas.getBoundingClientRect();
+        const canvasX = e.clientX - rect.left;
+        const canvasY = e.clientY - rect.top;
+        
+        // Transform from screen coordinates to world coordinates
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: (canvasX - this.panX) / this.zoom,
+            y: (canvasY - this.panY) / this.zoom
+        };
+    }
+
+    screenToWorld(screenX, screenY) {
+        return {
+            x: (screenX - this.panX) / this.zoom,
+            y: (screenY - this.panY) / this.zoom
+        };
+    }
+
+    worldToScreen(worldX, worldY) {
+        return {
+            x: worldX * this.zoom + this.panX,
+            y: worldY * this.zoom + this.panY
         };
     }
 
     handleMouseDown(e) {
-        if (e.button !== 0) return; // Only left click
         if (this.isDraggingModal) return; // Don't interact with canvas while dragging modal
+        
+        // Middle mouse button or space+left click for panning
+        if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+            this.isPanning = true;
+            const rect = this.canvas.getBoundingClientRect();
+            this.lastPanPoint = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+            this.canvas.style.cursor = 'grabbing';
+            e.preventDefault();
+            return;
+        }
+        
+        if (e.button !== 0) return; // Only left click for tools
         
         const pos = this.getMousePos(e);
         
@@ -213,6 +265,23 @@ class GeometryApp {
     handleMouseMove(e) {
         if (this.isDraggingModal) return; // Don't interact with canvas while dragging modal
         
+        // Handle panning
+        if (this.isPanning) {
+            const rect = this.canvas.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+            
+            const deltaX = currentX - this.lastPanPoint.x;
+            const deltaY = currentY - this.lastPanPoint.y;
+            
+            this.panX += deltaX;
+            this.panY += deltaY;
+            
+            this.lastPanPoint = { x: currentX, y: currentY };
+            this.render();
+            return;
+        }
+        
         const pos = this.getMousePos(e);
 
         // Handle dragging in select mode
@@ -233,6 +302,11 @@ class GeometryApp {
     }
 
     handleMouseUp(e) {
+        if (this.isPanning) {
+            this.isPanning = false;
+            this.updateCanvasCursor();
+        }
+        
         if (this.isDragging) {
             this.isDragging = false;
             this.canvas.classList.remove('dragging');
@@ -241,9 +315,38 @@ class GeometryApp {
 
     handleMouseLeave(e) {
         this.isDragging = false;
+        this.isPanning = false;
         this.canvas.classList.remove('dragging');
+        this.updateCanvasCursor();
         this.hoveredPoint = null;
         this.render();
+    }
+
+    handleWheel(e) {
+        e.preventDefault();
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        // Get world position before zoom
+        const worldPos = this.screenToWorld(mouseX, mouseY);
+        
+        // Update zoom
+        const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+        const newZoom = Math.max(0.1, Math.min(10, this.zoom * zoomFactor));
+        
+        if (newZoom !== this.zoom) {
+            this.zoom = newZoom;
+            
+            // Adjust pan to keep mouse position fixed
+            const newScreenPos = this.worldToScreen(worldPos.x, worldPos.y);
+            this.panX += mouseX - newScreenPos.x;
+            this.panY += mouseY - newScreenPos.y;
+            
+            this.updateZoomDisplay();
+            this.render();
+        }
     }
 
     handleContextMenu(e) {
@@ -316,7 +419,61 @@ class GeometryApp {
                 this.updateInstructions();
                 this.render();
                 break;
+            case '+':
+            case '=':
+                this.zoomIn();
+                break;
+            case '-':
+            case '_':
+                this.zoomOut();
+                break;
+            case '0':
+                this.resetZoom();
+                break;
         }
+    }
+
+    zoomIn() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const worldPos = this.screenToWorld(centerX, centerY);
+        
+        this.zoom = Math.min(10, this.zoom * 1.2);
+        
+        const newScreenPos = this.worldToScreen(worldPos.x, worldPos.y);
+        this.panX += centerX - newScreenPos.x;
+        this.panY += centerY - newScreenPos.y;
+        
+        this.updateZoomDisplay();
+        this.render();
+    }
+
+    zoomOut() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const worldPos = this.screenToWorld(centerX, centerY);
+        
+        this.zoom = Math.max(0.1, this.zoom / 1.2);
+        
+        const newScreenPos = this.worldToScreen(worldPos.x, worldPos.y);
+        this.panX += centerX - newScreenPos.x;
+        this.panY += centerY - newScreenPos.y;
+        
+        this.updateZoomDisplay();
+        this.render();
+    }
+
+    resetZoom() {
+        this.zoom = 1.0;
+        this.panX = 0;
+        this.panY = 0;
+        this.updateZoomDisplay();
+        this.render();
+    }
+
+    updateZoomDisplay() {
+        const zoomPercent = Math.round(this.zoom * 100);
+        document.getElementById('zoom-level').textContent = `${zoomPercent}%`;
     }
 
     addPoint(x, y, isIntersection = false) {
@@ -476,6 +633,13 @@ class GeometryApp {
     render() {
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Save the current context state
+        this.ctx.save();
+        
+        // Apply zoom and pan transformations
+        this.ctx.translate(this.panX, this.panY);
+        this.ctx.scale(this.zoom, this.zoom);
 
         // Draw grid (subtle)
         this.drawGrid();
@@ -507,6 +671,9 @@ class GeometryApp {
         if (this.currentTool === 'compass' && this.tempSelection) {
             this.drawCompassPreview(this.tempSelection);
         }
+        
+        // Restore the context state
+        this.ctx.restore();
     }
 
     drawGrid() {
