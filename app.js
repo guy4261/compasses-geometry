@@ -349,6 +349,7 @@ class GeometryApp {
 
                 if (!lineExists) {
                     this.lines.push(new Line(this.tempSelection, point));
+                    this.updateIntersections();
                 }
             }
             this.tempSelection = null;
@@ -388,6 +389,36 @@ class GeometryApp {
         for (let i = 0; i < this.circles.length; i++) {
             for (let j = i + 1; j < this.circles.length; j++) {
                 const intersections = getCircleCircleIntersection(this.circles[i], this.circles[j]);
+                
+                for (const intersection of intersections) {
+                    // Check if an intersection point already exists nearby
+                    const existing = findClosestPoint(this.points, intersection.x, intersection.y, 5);
+                    if (!existing) {
+                        this.points.push(intersection);
+                    }
+                }
+            }
+        }
+
+        // Calculate all line-line intersections
+        for (let i = 0; i < this.lines.length; i++) {
+            for (let j = i + 1; j < this.lines.length; j++) {
+                const intersections = getLineLineIntersection(this.lines[i], this.lines[j]);
+                
+                for (const intersection of intersections) {
+                    // Check if an intersection point already exists nearby
+                    const existing = findClosestPoint(this.points, intersection.x, intersection.y, 5);
+                    if (!existing) {
+                        this.points.push(intersection);
+                    }
+                }
+            }
+        }
+
+        // Calculate all line-circle intersections
+        for (let i = 0; i < this.lines.length; i++) {
+            for (let j = 0; j < this.circles.length; j++) {
+                const intersections = getLineCircleIntersection(this.lines[i], this.circles[j]);
                 
                 for (const intersection of intersections) {
                     // Check if an intersection point already exists nearby
