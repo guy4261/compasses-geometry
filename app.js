@@ -170,12 +170,7 @@ class GeometryApp {
             }
         });
 
-        // Close modal on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
-        });
+        // Escape key handling is now done in handleKeyDown method to avoid conflicts
     }
 
     showLoadJsonModal() {
@@ -575,30 +570,46 @@ class GeometryApp {
     }
 
     handleKeyDown(e) {
-        if (!this.selectedPoint) return;
+        // Check if the Load JSON modal is open
+        const loadJsonModal = document.getElementById('load-json-modal');
+        const isModalOpen = loadJsonModal && !loadJsonModal.classList.contains('hidden');
+
+        // If modal is open, only handle Escape to close it
+        if (isModalOpen) {
+            if (e.key === 'Escape') {
+                loadJsonModal.classList.add('hidden');
+                document.getElementById('json-input').value = '';
+                document.getElementById('json-error').classList.add('hidden');
+            }
+            return; // Don't process other keys when modal is open
+        }
 
         const moveDistance = e.shiftKey ? 10 : 1;
 
         switch (e.key) {
             case 'ArrowUp':
+                if (!this.selectedPoint) return;
                 e.preventDefault();
                 this.selectedPoint.y -= moveDistance;
                 this.updateIntersections();
                 this.render();
                 break;
             case 'ArrowDown':
+                if (!this.selectedPoint) return;
                 e.preventDefault();
                 this.selectedPoint.y += moveDistance;
                 this.updateIntersections();
                 this.render();
                 break;
             case 'ArrowLeft':
+                if (!this.selectedPoint) return;
                 e.preventDefault();
                 this.selectedPoint.x -= moveDistance;
                 this.updateIntersections();
                 this.render();
                 break;
             case 'ArrowRight':
+                if (!this.selectedPoint) return;
                 e.preventDefault();
                 this.selectedPoint.x += moveDistance;
                 this.updateIntersections();
@@ -606,6 +617,7 @@ class GeometryApp {
                 break;
             case 'Delete':
             case 'Backspace':
+                if (!this.selectedPoint) return;
                 e.preventDefault();
                 this.deletePoint(this.selectedPoint);
                 break;
@@ -617,12 +629,12 @@ class GeometryApp {
             case 'L':
                 this.setTool('line');
                 break;
-            case 'o':
-            case 'O':
+            case 'c':
+            case 'C':
                 this.setTool('compass');
                 break;
-            case 'i':
-            case 'I':
+            case 's':
+            case 'S':
                 this.setTool('select');
                 break;
             case 'Escape':

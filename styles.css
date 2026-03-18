@@ -219,6 +219,8 @@ body {
     padding: 16px;
     overflow-y: auto;
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 #toolbar-modal {
@@ -382,8 +384,10 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    min-width: 500px;
-    max-width: 600px;
+    width: 80vw;
+    max-width: 900px;
+    height: 90vh;
+    max-height: none;
 }
 
 .load-json-modal.hidden {
@@ -392,6 +396,10 @@ body {
 
 .load-json-modal .modal-header {
     cursor: default;
+}
+
+.load-json-modal .modal-content {
+    overflow-y: hidden;
 }
 
 .load-json-description {
@@ -441,13 +449,13 @@ body {
 
 .json-input {
     width: 100%;
-    min-height: 200px;
+    flex: 1;
     padding: 12px;
     border: 2px solid #e0e0e0;
     border-radius: 6px;
     font-family: 'Monaco', 'Courier New', monospace;
     font-size: 12px;
-    resize: vertical;
+    resize: none;
     margin-bottom: 16px;
     transition: border-color 0.2s ease;
 }
@@ -514,7 +522,7 @@ body {
 
 @media (max-width: 768px) {
     .load-json-modal {
-        min-width: 90vw;
-        max-width: 90vw;
+        width: 95vw;
+        height: 95vh;
     }
 }
