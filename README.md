@@ -40,8 +40,8 @@ A browser-based geometry drawing tool with ruler and compass functionality, buil
 ### Keyboard Shortcuts
 - `P` - Point tool
 - `L` - Line tool
-- `C` - Compass tool
-- `S` - Select tool
+- `O` - Compass tool
+- `I` - Select tool
 - `Delete` or `Backspace` - Delete selected point
 - `Arrow keys` - Move selected point (hold Shift for faster movement)
 - `Esc` - Cancel current operation

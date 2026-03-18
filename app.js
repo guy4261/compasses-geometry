@@ -302,12 +302,12 @@ class GeometryApp {
             case 'L':
                 this.setTool('line');
                 break;
-            case 'c':
-            case 'C':
+            case 'o':
+            case 'O':
                 this.setTool('compass');
                 break;
-            case 's':
-            case 'S':
+            case 'i':
+            case 'I':
                 this.setTool('select');
                 break;
             case 'Escape':
