@@ -39,6 +39,34 @@ body {
     cursor: grabbing;
 }
 
+.github-link {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #333;
+    transition: all 0.3s ease;
+    z-index: 999;
+    text-decoration: none;
+}
+
+.github-link:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    color: #667eea;
+}
+
+.github-link:active {
+    transform: translateY(0) scale(1);
+}
+
 .toolbar {
     display: flex;
     gap: 8px;
@@ -288,6 +316,18 @@ body {
     #help-modal {
         bottom: 10px;
         right: 10px;
+    }
+
+    .github-link {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .github-link svg {
+        width: 20px;
+        height: 20px;
     }
 }
 
