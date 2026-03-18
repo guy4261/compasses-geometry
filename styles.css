@@ -6,102 +6,21 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.container {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     overflow: hidden;
-    max-width: 1400px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    max-height: 95vh;
-}
-
-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px 30px;
-}
-
-h1 {
-    font-size: 28px;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-.toolbar {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.tool-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-}
-
-.tool-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
-}
-
-.tool-btn.active {
-    background: white;
-    color: #667eea;
-    border-color: white;
-}
-
-.tool-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
-.divider {
-    width: 2px;
-    height: 30px;
-    background: rgba(255, 255, 255, 0.3);
-    margin: 0 5px;
-}
-
-.canvas-container {
-    flex: 1;
-    position: relative;
-    background: #f8f9fa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    min-height: 500px;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 #canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     background: white;
     cursor: crosshair;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    margin: 20px;
 }
 
 #canvas.select-mode {
@@ -112,17 +31,141 @@ h1 {
     cursor: grabbing;
 }
 
+.toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.tool-btn {
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+    transform: translateY(-1px);
+}
+
+.tool-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.tool-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.divider {
+    width: 1px;
+    height: 30px;
+    background: #e0e0e0;
+    margin: 0 3px;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 300px;
+    max-width: 400px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal.minimized .modal-content {
+    display: none;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 12px 12px 0 0;
+    cursor: move;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.modal-control-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.modal-control-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-content {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+#toolbar-modal {
+    top: 20px;
+    left: 20px;
+}
+
+#help-modal {
+    bottom: 20px;
+    right: 20px;
+}
+
 .instructions {
     background: rgba(102, 126, 234, 0.1);
-    border-left: 4px solid #667eea;
+    border-left: 3px solid #667eea;
     color: #333;
-    padding: 12px 30px;
-    font-size: 14px;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 10px;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-top: 10px;
 }
 
 .instruction-text {
-    text-align: center;
+    text-align: left;
+    font-weight: 500;
 }
 
 .context-menu {
@@ -151,75 +194,60 @@ h1 {
     background: #f0f0f0;
 }
 
-.info-panel {
-    background: #f8f9fa;
-    padding: 30px;
-    border-top: 1px solid #e0e0e0;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.info-panel h3 {
-    color: #667eea;
-    margin-bottom: 20px;
-    font-size: 20px;
-}
-
 .info-section {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+}
+
+.info-section:last-child {
+    margin-bottom: 0;
 }
 
 .info-section h4 {
     color: #333;
-    margin-bottom: 8px;
-    font-size: 15px;
+    margin-bottom: 6px;
+    font-size: 14px;
     font-weight: 600;
 }
 
 .info-section p {
     color: #666;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-
-    header {
-        padding: 15px 20px;
-    }
-
-    h1 {
-        font-size: 22px;
-        margin-bottom: 10px;
-    }
-
     .tool-btn span {
         display: none;
     }
 
     .tool-btn {
-        padding: 10px;
+        padding: 8px;
     }
 
-    .info-panel {
-        padding: 20px;
+    .modal {
+        min-width: 250px;
+        max-width: 90vw;
     }
 
-    .canvas-container {
-        min-height: 400px;
+    #toolbar-modal {
+        top: 10px;
+        left: 10px;
     }
 
-    #canvas {
-        margin: 10px;
+    #help-modal {
+        bottom: 10px;
+        right: 10px;
     }
 }
 
 /* Keyboard focus styles */
 .tool-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.modal-control-btn:focus {
     outline: 2px solid rgba(255, 255, 255, 0.5);
     outline-offset: 2px;
 }
@@ -241,20 +269,20 @@ h1 {
 }
 
 /* Scrollbar styling */
-.info-panel::-webkit-scrollbar {
-    width: 8px;
+.modal-content::-webkit-scrollbar {
+    width: 6px;
 }
 
-.info-panel::-webkit-scrollbar-track {
-    background: #e0e0e0;
-    border-radius: 4px;
+.modal-content::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 3px;
 }
 
-.info-panel::-webkit-scrollbar-thumb {
+.modal-content::-webkit-scrollbar-thumb {
     background: #667eea;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
-.info-panel::-webkit-scrollbar-thumb:hover {
+.modal-content::-webkit-scrollbar-thumb:hover {
     background: #5568d3;
 }

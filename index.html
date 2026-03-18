@@ -7,9 +7,21 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Geometry Drawing Tool</h1>
+    <canvas id="canvas"></canvas>
+    
+    <!-- Toolbar Modal -->
+    <div id="toolbar-modal" class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Tools</h3>
+            <div class="modal-controls">
+                <button class="modal-control-btn" data-action="minimize" title="Minimize">
+                    <svg width="16" height="16" viewBox="0 0 16 16">
+                        <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="modal-content">
             <div class="toolbar">
                 <button id="tool-point" class="tool-btn active" title="Place points (P)">
                     <svg width="24" height="24" viewBox="0 0 24 24">
@@ -46,21 +58,25 @@
                     <span>Clear</span>
                 </button>
             </div>
-        </header>
-        
-        <div id="instructions" class="instructions">
-            <div class="instruction-text">Click to place a point</div>
-        </div>
-        
-        <div class="canvas-container">
-            <canvas id="canvas"></canvas>
-            <div id="context-menu" class="context-menu hidden">
-                <div class="context-menu-item" data-action="delete">Delete</div>
+            <div id="instructions" class="instructions">
+                <div class="instruction-text">Click to place a point</div>
             </div>
         </div>
+    </div>
 
-        <aside class="info-panel">
-            <h3>How to Use</h3>
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Help</h3>
+            <div class="modal-controls">
+                <button class="modal-control-btn" data-action="minimize" title="Minimize">
+                    <svg width="16" height="16" viewBox="0 0 16 16">
+                        <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="modal-content">
             <div class="info-section">
                 <h4>🎯 Point Tool (P)</h4>
                 <p>Click on canvas to place points</p>
@@ -81,7 +97,12 @@
                 <h4>✨ Auto-Intersections</h4>
                 <p>Intersection points are automatically created when circles intersect</p>
             </div>
-        </aside>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu hidden">
+        <div class="context-menu-item" data-action="delete">Delete</div>
     </div>
 
     <script src="geometry.js"></script>

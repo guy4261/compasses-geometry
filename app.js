@@ -19,7 +19,10 @@ class GeometryApp {
         
         // Interaction state
         this.isDragging = false;
+        this.isDraggingModal = false;
         this.hoveredPoint = null;
+        this.draggedModal = null;
+        this.modalDragOffset = { x: 0, y: 0 };
         
         // UI elements
         this.contextMenu = document.getElementById('context-menu');
@@ -27,17 +30,15 @@ class GeometryApp {
         
         this.setupCanvas();
         this.setupEventListeners();
+        this.setupModals();
         this.updateInstructions();
         this.render();
     }
 
     setupCanvas() {
-        const container = this.canvas.parentElement;
-        const rect = container.getBoundingClientRect();
-        
-        // Set canvas size
-        this.canvas.width = Math.min(rect.width - 40, 1200);
-        this.canvas.height = Math.min(rect.height - 40, 700);
+        // Set canvas to full viewport size
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
     }
 
     setupEventListeners() {
@@ -76,6 +77,62 @@ class GeometryApp {
         window.addEventListener('resize', () => {
             this.setupCanvas();
             this.render();
+        });
+    }
+
+    setupModals() {
+        const modals = document.querySelectorAll('.modal');
+        
+        modals.forEach(modal => {
+            const header = modal.querySelector('.modal-header');
+            const minimizeBtn = modal.querySelector('[data-action="minimize"]');
+            
+            // Dragging functionality
+            header.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.modal-control-btn')) return;
+                
+                this.isDraggingModal = true;
+                this.draggedModal = modal;
+                
+                const rect = modal.getBoundingClientRect();
+                this.modalDragOffset = {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+                
+                modal.style.transition = 'none';
+                e.preventDefault();
+            });
+            
+            // Minimize functionality
+            minimizeBtn.addEventListener('click', () => {
+                modal.classList.toggle('minimized');
+            });
+        });
+        
+        // Global mouse events for modal dragging
+        document.addEventListener('mousemove', (e) => {
+            if (this.isDraggingModal && this.draggedModal) {
+                const x = e.clientX - this.modalDragOffset.x;
+                const y = e.clientY - this.modalDragOffset.y;
+                
+                // Keep modal within viewport bounds
+                const maxX = window.innerWidth - this.draggedModal.offsetWidth;
+                const maxY = window.innerHeight - 40; // Keep at least header visible
+                
+                this.draggedModal.style.left = Math.max(0, Math.min(x, maxX)) + 'px';
+                this.draggedModal.style.top = Math.max(0, Math.min(y, maxY)) + 'px';
+                this.draggedModal.style.right = 'auto';
+                this.draggedModal.style.bottom = 'auto';
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (this.isDraggingModal && this.draggedModal) {
+                this.draggedModal.style.transition = '';
+                this.isDraggingModal = false;
+                this.draggedModal = null;
+            }
         });
     }
 
@@ -122,6 +179,7 @@ class GeometryApp {
 
     handleMouseDown(e) {
         if (e.button !== 0) return; // Only left click
+        if (this.isDraggingModal) return; // Don't interact with canvas while dragging modal
         
         const pos = this.getMousePos(e);
         
@@ -153,6 +211,8 @@ class GeometryApp {
     }
 
     handleMouseMove(e) {
+        if (this.isDraggingModal) return; // Don't interact with canvas while dragging modal
+        
         const pos = this.getMousePos(e);
 
         // Handle dragging in select mode
