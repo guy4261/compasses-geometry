@@ -55,6 +55,7 @@ class GeometryApp {
         document.getElementById('tool-compass').addEventListener('click', () => this.setTool('compass'));
         document.getElementById('tool-select').addEventListener('click', () => this.setTool('select'));
         document.getElementById('clear-all').addEventListener('click', () => this.clearAll());
+        document.getElementById('copy-json').addEventListener('click', () => this.copyToClipboard());
         
         // Zoom buttons
         document.getElementById('zoom-in').addEventListener('click', () => this.zoomIn());
@@ -628,6 +629,82 @@ class GeometryApp {
 
     hideContextMenu() {
         this.contextMenu.classList.add('hidden');
+    }
+
+    /**
+     * Generate alphabetic ID (A, B, C... Z, AA, AB, AC...)
+     */
+    generateAlphabeticId(index) {
+        let result = '';
+        let num = index;
+        
+        while (num >= 0) {
+            result = String.fromCharCode(65 + (num % 26)) + result;
+            num = Math.floor(num / 26) - 1;
+        }
+        
+        return result;
+    }
+
+    /**
+     * Copy JSON representation to clipboard
+     */
+    async copyToClipboard() {
+        // Filter out intersection points for user-created points only
+        const userPoints = this.points.filter(p => !p.isIntersection);
+        
+        // Create a map of point internal IDs to alphabetic IDs
+        const pointIdMap = new Map();
+        userPoints.forEach((point, index) => {
+            pointIdMap.set(point.id, this.generateAlphabeticId(index));
+        });
+        
+        // Build JSON structure
+        const jsonData = {
+            points: userPoints.map(point => ({
+                id: pointIdMap.get(point.id),
+                internalId: point.id,
+                x: Math.round(point.x * 100) / 100,
+                y: Math.round(point.y * 100) / 100
+            })),
+            lines: this.lines.map(line => {
+                const point1Id = pointIdMap.get(line.point1.id);
+                const point2Id = pointIdMap.get(line.point2.id);
+                return {
+                    id: `${point1Id}-${point2Id}`,
+                    internalId: line.id,
+                    points: [point1Id, point2Id]
+                };
+            }),
+            circles: this.circles.map(circle => {
+                const centerId = pointIdMap.get(circle.center.id);
+                return {
+                    id: centerId,
+                    internalId: circle.id,
+                    center: centerId,
+                    radius: Math.round(circle.radius * 100) / 100
+                };
+            })
+        };
+        
+        const jsonString = JSON.stringify(jsonData, null, 2);
+        
+        try {
+            await navigator.clipboard.writeText(jsonString);
+            // Visual feedback
+            const button = document.getElementById('copy-json');
+            const originalText = button.querySelector('span').textContent;
+            button.querySelector('span').textContent = 'Copied!';
+            button.classList.add('active');
+            
+            setTimeout(() => {
+                button.querySelector('span').textContent = originalText;
+                button.classList.remove('active');
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy to clipboard:', err);
+            alert('Failed to copy to clipboard. Please try again.');
+        }
     }
 
     render() {
