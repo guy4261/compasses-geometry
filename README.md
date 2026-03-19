@@ -2,6 +2,8 @@
 
 [Try it now:](https://guy4261.github.io/compasses-geometry/). Built solely by [`continue.dev`](https://continue.dev).
 
+Inspired by the fantastic [Byrne’s Euclid](https://c82.net/euclid/en/) - check it out!
+
 A browser-based geometry drawing tool with ruler and compass functionality, built with vanilla JavaScript, HTML5 Canvas, and CSS.
 
 ## Features
